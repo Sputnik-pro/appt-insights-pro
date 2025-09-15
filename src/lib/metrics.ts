@@ -18,18 +18,19 @@ export function calculateMetrics(appointments: Appointment[]): AppointmentMetric
     };
   }
 
-  // Contar por status
+  // Contar por status (CORRIGIDO para os status reais da API)
   const statusCounts = appointments.reduce((acc, appointment) => {
     const status = appointment.appointment_status;
     acc[status] = (acc[status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
-  const confirmed = statusCounts['Confirmado'] || 0;
-  const completed = statusCounts['Realizado'] || 0;
-  const canceled = statusCounts['Cancelado'] || 0;
+  // Mapear para os status corretos da sua API
+  const confirmed = statusCounts['Confirmada'] || 0;  // ← CORRIGIDO
+  const completed = statusCounts['Realizada'] || 0;   // ← CORRIGIDO  
+  const canceled = statusCounts['Cancelada'] || 0;    // ← CORRIGIDO
   const noShow = statusCounts['No-show'] || 0;
-  const pending = statusCounts['Agendado'] || 0;
+  const pending = statusCounts['Não Confirmada'] || 0; // ← CORRIGIDO
 
   // Calcular taxas
   const realizationRate = total > 0 ? (completed / total) * 100 : 0;
@@ -51,35 +52,30 @@ export function calculateMetrics(appointments: Appointment[]): AppointmentMetric
   };
 }
 
+// Função para exportar dados para CSV
 export function exportToCSV(appointments: Appointment[], filename?: string) {
   const headers = [
     "ID Oportunidade",
     "Paciente", 
     "Cidade",
-    "Data/Hora",
     "Procedimento",
     "Médico",
     "Convênio",
     "Status",
     "Telefone",
-    "Email",
-    "Observações"
+    "Email"
   ];
   
   const csvData = appointments.map(appointment => [
     appointment.opportunity_id || '',
     appointment.patient_name || '',
     appointment.city || '',
-    appointment.appointment_date 
-      ? new Date(appointment.appointment_date).toLocaleString('pt-BR')
-      : "N/A",
     appointment.procedure || '',
     appointment.doctor || '',
     appointment.insurance || '',
     appointment.appointment_status || '',
     appointment.phone || '',
-    appointment.email || '',
-    appointment.notes || ''
+    appointment.email || ''
   ]);
 
   const csvContent = [
