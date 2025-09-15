@@ -53,11 +53,11 @@ export function FilterBar({
     onFilterChange({
       startDate: oneYearAgo.toISOString().split('T')[0],
       endDate: today.toISOString().split('T')[0],
-      doctor: '',
-      city: '',
-      status: '',
-      procedure: '',
-      insurance: ''
+      doctor: 'all',
+      city: 'all',
+      status: 'all',
+      procedure: 'all',
+      insurance: 'all'
     });
   };
 
@@ -109,7 +109,7 @@ export function FilterBar({
                 <SelectValue placeholder="Todos os médicos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os médicos</SelectItem>
+                <SelectItem value="all">Todos os médicos</SelectItem>
                 {options.doctors.map((doctor) => (
                   <SelectItem key={doctor} value={doctor}>
                     {doctor}
@@ -130,7 +130,7 @@ export function FilterBar({
                 <SelectValue placeholder="Todas as cidades" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as cidades</SelectItem>
+                <SelectItem value="all">Todas as cidades</SelectItem>
                 {options.cities.map((city) => (
                   <SelectItem key={city} value={city}>
                     {city}
@@ -151,7 +151,7 @@ export function FilterBar({
                 <SelectValue placeholder="Todos os status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os status</SelectItem>
+                <SelectItem value="all">Todos os status</SelectItem>
                 {options.statuses.map((status) => (
                   <SelectItem key={status} value={status}>
                     {status}
@@ -172,7 +172,7 @@ export function FilterBar({
                 <SelectValue placeholder="Todos os procedimentos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os procedimentos</SelectItem>
+                <SelectItem value="all">Todos os procedimentos</SelectItem>
                 {options.procedures.map((procedure) => (
                   <SelectItem key={procedure} value={procedure}>
                     {procedure}
@@ -193,7 +193,7 @@ export function FilterBar({
                 <SelectValue placeholder="Todos os convênios" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os convênios</SelectItem>
+                <SelectItem value="all">Todos os convênios</SelectItem>
                 {options.insurances.map((insurance) => (
                   <SelectItem key={insurance} value={insurance}>
                     {insurance}
