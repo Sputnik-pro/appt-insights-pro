@@ -1,12 +1,25 @@
 import { useState, useMemo } from "react";
+useEffect(() => {
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchRealAppointments();
+      setAppointments(data);
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  loadData();
+}, []);
 import { Calendar, Clock, CheckCircle, XCircle, TrendingUp, AlertTriangle } from "lucide-react";
 import { subDays, isAfter, isBefore } from "date-fns";
 import { MetricCard } from "./MetricCard";
 import { FilterBar } from "./FilterBar";
 import { Charts } from "./Charts";
 import { AppointmentsTable } from "./AppointmentsTable";
-import { mockAppointments, doctors, cities, procedures, insurances, statuses, Appointment } from "@/data/mockData";
-
+import { fetchRealAppointments, doctors, cities, procedures, insurances, statuses, Appointment } from "@/data/mockData";
 interface DashboardFilters {
   period: string;
   doctor: string;
@@ -18,7 +31,8 @@ interface DashboardFilters {
 }
 
 export function MedicalDashboard() {
-  const [appointments, setAppointments] = useState<Appointment[]>(mockAppointments);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<DashboardFilters>({
     period: "30",
     doctor: "all",
@@ -81,10 +95,17 @@ export function MedicalDashboard() {
     }));
   };
 
-  const handleRefresh = () => {
-    // In a real application, this would fetch new data from the API
-    console.log("Refreshing dashboard data...");
-  };
+  const handleRefresh = async () => {
+  setLoading(true);
+  try {
+    const data = await fetchRealAppointments();
+    setAppointments(data);
+  } catch (error) {
+    console.error('Erro ao atualizar dados:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Generate filter options from current data
   const filterOptions = useMemo(() => ({
