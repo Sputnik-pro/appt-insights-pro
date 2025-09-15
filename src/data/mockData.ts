@@ -78,27 +78,40 @@ export const statuses: AppointmentStatus[] = [
   "Pós Cirurgia"
 ];
 
-// Generate realistic mock data
-export const generateMockAppointments = (count: number = 150): Appointment[] => {
-  const appointments: Appointment[] = [];
-  
-  for (let i = 0; i < count; i++) {
-    const createdDate = subDays(new Date(), Math.floor(Math.random() * 365));
-    const appointmentDate = addDays(createdDate, Math.floor(Math.random() * 30) + 1);
+// Adicione esta função no lugar da generateMockAppointments
+export const fetchRealAppointments = async (): Promise<Appointment[]> => {
+  try {
+    const response = await fetch('https://sputnik-n8n.cloudfy.cloud/webhook/dashboard-data');
+    const data = await response.json();
     
-    appointments.push({
-      opportunity_id: `HJGP${String(i + 1000).slice(-3)}`,
-      patient_name: generatePatientName(),
-      doctor: doctors[Math.floor(Math.random() * doctors.length)],
-      city: cities[Math.floor(Math.random() * cities.length)],
-      procedure: procedures[Math.floor(Math.random() * procedures.length)],
-      insurance: insurances[Math.floor(Math.random() * insurances.length)],
-      appointment_status: getWeightedStatus(),
-      phone: generatePhone(),
-      created_at: createdDate.toISOString(),
-      appointment_date: appointmentDate.toISOString()
-    });
+    console.log('Dados da API:', data);
+    
+    // Mapear dados reais para o formato esperado
+    const mappedData: Appointment[] = data.map((item: any) => ({
+      opportunity_id: item.opportunity_id,
+      patient_name: item.patient_name,
+      doctor: item.doctor || 'Médico não definido',
+      city: item.city || 'Cidade não informada', 
+      procedure: item.procedure || 'Procedimento não informado',
+      insurance: item.insurance || 'Convênio não informado',
+      appointment_status: item.appointment_status as AppointmentStatus,
+      phone: item.phone || '',
+      created_at: item.created_at || new Date().toISOString(),
+      appointment_date: item.created_at || new Date().toISOString()
+    }));
+    
+    return mappedData;
+  } catch (error) {
+    console.error('Erro ao buscar dados reais:', error);
+    // Fallback para dados mock em caso de erro
+    return generateMockAppointments();
   }
+};
+
+// Manter a função original como fallback
+const generateMockAppointments = (count: number = 150): Appointment[] => {
+  // ... manter código original ...
+};
   
   return appointments.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 };
