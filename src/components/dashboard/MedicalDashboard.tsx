@@ -45,7 +45,7 @@ export function MedicalDashboard() {
   }
 
   const hasActiveFilters = Object.values(filters).some(filter => 
-    filter !== '' && filter !== filters.startDate && filter !== filters.endDate
+    filter !== 'all' && filter !== filters.startDate && filter !== filters.endDate
   );
 
   return (
@@ -85,7 +85,6 @@ export function MedicalDashboard() {
             value={metrics.total}
             icon={Calendar}
             color="primary"
-            trend={{ value: 12.5, isPositive: true }}
           />
           
           <MetricCard
@@ -93,23 +92,20 @@ export function MedicalDashboard() {
             value={metrics.confirmed}
             icon={Clock}
             color="secondary"
-            trend={{ value: 8.3, isPositive: true }}
           />
           
           <MetricCard
-            title="Cirurgias Realizadas"
+            title="Agendamentos Realizados"
             value={metrics.completed}
             icon={CheckCircle}
             color="success"
-            trend={{ value: 15.7, isPositive: true }}
           />
           
           <MetricCard
-            title="Cirurgias Canceladas"
+            title="Agendamentos Cancelados"
             value={metrics.canceled}
             icon={XCircle}
             color="destructive"
-            trend={{ value: 5.2, isPositive: false }}
           />
           
           <MetricCard
@@ -118,7 +114,6 @@ export function MedicalDashboard() {
             icon={TrendingUp}
             color="success"
             format="percentage"
-            trend={{ value: 3.1, isPositive: true }}
           />
           
           <MetricCard
@@ -127,7 +122,6 @@ export function MedicalDashboard() {
             icon={AlertTriangle}
             color="warning"
             format="percentage"
-            trend={{ value: 2.4, isPositive: false }}
           />
         </div>
 
