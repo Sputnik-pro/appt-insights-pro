@@ -1,126 +1,57 @@
-import { useState, useMemo } from "react";
-useEffect(() => {
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchRealAppointments();
-      setAppointments(data);
-    } catch (error) {
-      console.error('Erro ao carregar dados:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  loadData();
-}, []);
+import { useQuery } from "@tanstack/react-query";
 import { Calendar, Clock, CheckCircle, XCircle, TrendingUp, AlertTriangle } from "lucide-react";
-import { subDays, isAfter, isBefore } from "date-fns";
-import { MetricCard } from "./MetricCard";
-import { FilterBar } from "./FilterBar";
-import { Charts } from "./Charts";
-import { AppointmentsTable } from "./AppointmentsTable";
-import { fetchRealAppointments, doctors, cities, procedures, insurances, statuses, Appointment } from "@/data/mockData";
-interface DashboardFilters {
-  period: string;
-  doctor: string;
-  patient: string;
-  status: string;
-  city: string;
-  procedure: string;
-  insurance: string;
-}
+import { FilterBar } from "@/components/dashboard/FilterBar";
+import { MetricCard } from "@/components/dashboard/MetricCard";
+import { Charts } from "@/components/dashboard/Charts";
+import { AppointmentsTable } from "@/components/dashboard/AppointmentsTable";
+import { useFilters } from "@/hooks/useFilters";
+import { fetchAppointments } from "@/lib/api";
+import { calculateMetrics, exportToCSV } from "@/lib/metrics";
 
 export function MedicalDashboard() {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<DashboardFilters>({
-    period: "30",
-    doctor: "all",
-    patient: "all", 
-    status: "all",
-    city: "all",
-    procedure: "all",
-    insurance: "all"
+  // Buscar dados dos agendamentos
+  const { data: appointments = [], isLoading, refetch } = useQuery({
+    queryKey: ['appointments'],
+    queryFn: fetchAppointments,
+    refetchInterval: 30000,
   });
 
-  // Filter appointments based on current filters
-  const filteredAppointments = useMemo(() => {
-    return appointments.filter(appointment => {
-      // Period filter
-      if (filters.period !== "all") {
-        const periodDays = parseInt(filters.period);
-        const cutoffDate = subDays(new Date(), periodDays);
-        const appointmentDate = new Date(appointment.created_at);
-        if (isBefore(appointmentDate, cutoffDate)) return false;
-      }
+  // Hook de filtros com dados filtrados
+  const {
+    filters,
+    filterOptions,
+    filteredAppointments,
+    handleFilterChange,
+    clearFilters
+  } = useFilters(appointments);
 
-      // Other filters
-      if (filters.doctor !== "all" && appointment.doctor !== filters.doctor) return false;
-      if (filters.patient !== "all" && appointment.patient_name !== filters.patient) return false;
-      if (filters.status !== "all" && appointment.appointment_status !== filters.status) return false;
-      if (filters.city !== "all" && appointment.city !== filters.city) return false;
-      if (filters.procedure !== "all" && appointment.procedure !== filters.procedure) return false;
-      if (filters.insurance !== "all" && appointment.insurance !== filters.insurance) return false;
+  // Calcular métricas baseadas nos dados filtrados
+  const metrics = calculateMetrics(filteredAppointments);
 
-      return true;
-    });
-  }, [appointments, filters]);
-
-  // Calculate metrics
-  const metrics = useMemo(() => {
-    const total = filteredAppointments.length;
-    const confirmed = filteredAppointments.filter(a => a.appointment_status === "Confirmada").length;
-    const completed = filteredAppointments.filter(a => a.appointment_status === "Concluída - Compareceu").length;
-    const canceled = filteredAppointments.filter(a => a.appointment_status === "Cancelada").length;
-    const noShow = filteredAppointments.filter(a => a.appointment_status === "Não Compareceu").length;
-    const postSurgery = filteredAppointments.filter(a => a.appointment_status === "Pós Cirurgia").length;
-    
-    const realizationRate = total > 0 ? ((completed + postSurgery) / total) * 100 : 0;
-    const noShowRate = total > 0 ? (noShow / total) * 100 : 0;
-
-    return {
-      total,
-      confirmed,
-      completed: completed + postSurgery,
-      canceled,
-      realizationRate,
-      noShowRate
-    };
-  }, [filteredAppointments]);
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value
-    }));
+  // Função para exportar dados filtrados
+  const handleExport = () => {
+    exportToCSV(filteredAppointments);
   };
 
-  const handleRefresh = async () => {
-  setLoading(true);
-  try {
-    const data = await fetchRealAppointments();
-    setAppointments(data);
-  } catch (error) {
-    console.error('Erro ao atualizar dados:', error);
-  } finally {
-    setLoading(false);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
+          <p className="text-white text-lg">Carregando dados...</p>
+        </div>
+      </div>
+    );
   }
-};
 
-  // Generate filter options from current data
-  const filterOptions = useMemo(() => ({
-    doctors: Array.from(new Set(appointments.map(a => a.doctor))).sort(),
-    patients: Array.from(new Set(appointments.map(a => a.patient_name))).sort(),
-    cities: Array.from(new Set(cities)).sort(),
-    procedures: Array.from(new Set(procedures)).sort(),
-    insurances: Array.from(new Set(insurances)).sort(),
-    statuses: statuses
-  }), [appointments]);
+  const hasActiveFilters = Object.values(filters).some(filter => 
+    filter !== '' && filter !== filters.startDate && filter !== filters.endDate
+  );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
-      <header className="medical-card rounded-none border-x-0 border-t-0 mb-8">
+      <header className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto px-6 py-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary-glow to-secondary bg-clip-text text-transparent mb-3">
@@ -129,20 +60,25 @@ const [loading, setLoading] = useState(true);
             <p className="text-xl text-muted-foreground">
               Agendamentos e Performance
             </p>
+            <div className="mt-4 text-sm text-muted-foreground">
+              {filteredAppointments.length} de {appointments.length} agendamentos
+              {hasActiveFilters ? ' (filtrados)' : ''}
+            </div>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-6 pb-8">
-        {/* Filters */}
+        {/* Filtros Avançados */}
         <FilterBar
           filters={filters}
           onFilterChange={handleFilterChange}
-          onRefresh={handleRefresh}
+          onRefresh={() => refetch()}
+          onExport={handleExport}
           options={filterOptions}
         />
 
-        {/* Metrics Cards */}
+        {/* Cards de Métricas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
           <MetricCard
             title="Total de Agendamentos"
@@ -195,10 +131,10 @@ const [loading, setLoading] = useState(true);
           />
         </div>
 
-        {/* Charts */}
+        {/* Gráficos */}
         <Charts appointments={filteredAppointments} />
 
-        {/* Appointments Table */}
+        {/* Tabela de Agendamentos */}
         <AppointmentsTable appointments={filteredAppointments} />
       </div>
     </div>
