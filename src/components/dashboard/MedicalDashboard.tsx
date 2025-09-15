@@ -35,10 +35,10 @@ export function MedicalDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="text-white text-lg">Carregando dados...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="text-gray-600 text-lg">Carregando dados...</p>
         </div>
       </div>
     );
@@ -49,18 +49,18 @@ export function MedicalDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-6 py-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary-glow to-secondary bg-clip-text text-transparent mb-3">
+            <h1 className="text-4xl font-bold text-gray-900 mb-3">
               Relatório Exclusivo HJGP
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-gray-600">
               Agendamentos e Performance
             </p>
-            <div className="mt-4 text-sm text-muted-foreground">
+            <div className="mt-4 text-sm text-gray-500">
               {filteredAppointments.length} de {appointments.length} agendamentos
               {hasActiveFilters ? ' (filtrados)' : ''}
             </div>
@@ -68,7 +68,7 @@ export function MedicalDashboard() {
         </div>
       </header>
 
-      <div className="container mx-auto px-6 pb-8">
+      <div className="container mx-auto px-6 py-8">
         {/* Filtros Avançados */}
         <FilterBar
           filters={filters}
@@ -80,49 +80,65 @@ export function MedicalDashboard() {
 
         {/* Cards de Métricas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
-          <MetricCard
-            title="Total de Agendamentos"
-            value={metrics.total}
-            icon={Calendar}
-            color="primary"
-          />
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total de Agendamentos</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.total}</p>
+              </div>
+              <Calendar className="h-8 w-8 text-blue-600" />
+            </div>
+          </div>
           
-          <MetricCard
-            title="Agendamentos Confirmados"
-            value={metrics.confirmed}
-            icon={Clock}
-            color="secondary"
-          />
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Agendamentos Confirmados</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.confirmed}</p>
+              </div>
+              <Clock className="h-8 w-8 text-green-600" />
+            </div>
+          </div>
           
-          <MetricCard
-            title="Agendamentos Realizados"
-            value={metrics.completed}
-            icon={CheckCircle}
-            color="success"
-          />
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Agendamentos Realizados</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.completed}</p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </div>
           
-          <MetricCard
-            title="Agendamentos Cancelados"
-            value={metrics.canceled}
-            icon={XCircle}
-            color="destructive"
-          />
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Agendamentos Cancelados</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.canceled}</p>
+              </div>
+              <XCircle className="h-8 w-8 text-red-600" />
+            </div>
+          </div>
           
-          <MetricCard
-            title="Taxa de Realização"
-            value={metrics.realizationRate}
-            icon={TrendingUp}
-            color="success"
-            format="percentage"
-          />
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Taxa de Realização</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.realizationRate}%</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-green-600" />
+            </div>
+          </div>
           
-          <MetricCard
-            title="Taxa de No-Show"
-            value={metrics.noShowRate}
-            icon={AlertTriangle}
-            color="warning"
-            format="percentage"
-          />
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Taxa de No-Show</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.noShowRate}%</p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-orange-600" />
+            </div>
+          </div>
         </div>
 
         {/* Gráficos */}
