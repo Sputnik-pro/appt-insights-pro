@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Appointment } from "@/types/appointment";
 import { format } from "date-fns";
+import * as XLSX from 'xlsx';
 
 interface AppointmentsTableProps {
   appointments: Appointment[];
@@ -48,39 +49,21 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
     setCurrentPage(1); // Reset para primeira página ao ordenar
   };
 
-  const exportToCSV = () => {
-    const headers = [
-      "Paciente", 
-      "Cidade",
-      "Procedimento",
-      "Médico",
-      "Convênio",
-      "Status"
-    ];
+  const exportToXLSX = () => {
+    const data = appointments.map(appointment => ({
+      "Paciente": appointment.patient_name,
+      "Cidade": appointment.city,
+      "Procedimento": appointment.procedure,
+      "Médico": appointment.doctor,
+      "Convênio": appointment.insurance,
+      "Status": appointment.appointment_status
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Agendamentos");
     
-    const csvData = appointments.map(appointment => [
-      appointment.patient_name,
-      appointment.city,
-      appointment.procedure,
-      appointment.doctor,
-      appointment.insurance,
-      appointment.appointment_status
-    ]);
-
-    const csvContent = [
-      headers.join(","),
-      ...csvData.map(row => row.map(cell => `"${cell}"`).join(","))
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `agendamentos_${format(new Date(), "yyyyMMdd")}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    XLSX.writeFile(workbook, `agendamentos_${format(new Date(), "yyyyMMdd")}.xlsx`);
   };
 
   const SortButton = ({ column, children }: { column: keyof Appointment; children: React.ReactNode }) => (
@@ -104,11 +87,11 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={exportToCSV}
+          onClick={exportToXLSX}
           className="flex items-center gap-2"
         >
           <Download className="h-4 w-4" />
-          Exportar CSV
+          Exportar XLSX
         </Button>
       </CardHeader>
       <CardContent className="p-0">

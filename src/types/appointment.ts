@@ -1,12 +1,12 @@
 // types/appointment.ts
 
 export type AppointmentStatus = 
-  | "Agendado"
-  | "Confirmado" 
-  | "Realizado"
-  | "Cancelado"
-  | "No-show"
-  | "Reagendado";
+  | "Não Confirmada" 
+  | "Confirmada" 
+  | "Concluída - Compareceu" 
+  | "Cancelada" 
+  | "Não Compareceu" 
+  | "Pós Cirurgia";
 
 export interface Appointment {
   id: string;

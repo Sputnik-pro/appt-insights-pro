@@ -110,10 +110,7 @@ export const fetchRealAppointments = async (): Promise<Appointment[]> => {
 
 // Manter a função original como fallback
 const generateMockAppointments = (count: number = 150): Appointment[] => {
-  // ... manter código original ...
-};
-  
-  return appointments.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  return [];
 };
 
 const firstNames = [
