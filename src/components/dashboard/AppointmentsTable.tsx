@@ -168,12 +168,12 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
         </div>
         
         {/* Paginação */}
-        <div className="flex items-center justify-between px-4 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-4 border-t border-gray-200 bg-gray-50">
           <div className="text-sm text-gray-600">
             Mostrando {startIndex + 1} a {Math.min(endIndex, sortedAppointments.length)} de {sortedAppointments.length} agendamentos
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -182,17 +182,17 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
               className="flex items-center gap-1"
             >
               <ChevronLeft className="h-4 w-4" />
-              Anterior
+              <span className="hidden sm:inline">Anterior</span>
             </Button>
             
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] sm:max-w-none">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <Button
                   key={page}
                   variant={currentPage === page ? "default" : "outline"}
                   size="sm"
                   onClick={() => setCurrentPage(page)}
-                  className="w-8 h-8 p-0"
+                  className="min-w-[32px] h-8 px-2 flex-shrink-0"
                 >
                   {page}
                 </Button>
@@ -206,7 +206,7 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
               disabled={currentPage === totalPages}
               className="flex items-center gap-1"
             >
-              Próximo
+              <span className="hidden sm:inline">Próximo</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
