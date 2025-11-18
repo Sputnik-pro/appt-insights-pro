@@ -25,19 +25,22 @@ export const fetchAppointments = async (): Promise<Appointment[]> => {
 
     // Mapear dados da API para o formato esperado
     const mappedData = Array.isArray(data) ? data.map(item => {
+      // Desencapsula o objeto json se existir
+      const actualItem = item.json || item;
+      
       return {
-        id: item.appointment_id || '',
-        opportunity_id: item.opportunity_id || item.appointment_id || '-',
-        patient_name: item.patient_name || 'Não informado',
-        doctor: item.doctor || item.doctor_name || 'Não informado',
-        city: item.city || item.patient_city || 'Não informada',
-        procedure: item.procedure || 'Não informado',
-        insurance: item.insurance || 'Não informado',
-        appointment_status: item.appointment_status || 'Não Confirmada',
-        appointment_date: item.appointment_date || item.start_time || new Date().toISOString(),
-        created_at: item.created_at || item.start_time || new Date().toISOString(),
-        updated_at: item.updated_at || item.start_time || new Date().toISOString(),
-        phone: item.phone || '',
+        id: actualItem.appointment_id || actualItem.opportunity_id || '',
+        opportunity_id: actualItem.opportunity_id || actualItem.appointment_id || '-',
+        patient_name: actualItem.patient_name || 'Não informado',
+        doctor: actualItem.doctor || actualItem.doctor_name || 'Não informado',
+        city: actualItem.city || actualItem.patient_city || 'Não informada',
+        procedure: actualItem.procedure || 'Não informado',
+        insurance: actualItem.insurance || 'Não informado',
+        appointment_status: actualItem.appointment_status || 'Não Confirmada',
+        appointment_date: actualItem.appointment_date || actualItem.start_time || new Date().toISOString(),
+        created_at: actualItem.created_at || actualItem.start_time || new Date().toISOString(),
+        updated_at: actualItem.updated_at || actualItem.start_time || new Date().toISOString(),
+        phone: actualItem.phone || '',
         notes: ''
       };
     }) : [];
@@ -106,19 +109,22 @@ export const fetchAppointmentsWithFilters = async (filters: {
     
     // Mapear dados filtrados
     const mappedData = Array.isArray(data) ? data.map(item => {
+      // Desencapsula o objeto json se existir
+      const actualItem = item.json || item;
+      
       return {
-        id: item.appointment_id || '',
-        opportunity_id: item.opportunity_id || item.appointment_id || '-',
-        patient_name: item.patient_name || 'Não informado',
-        doctor: item.doctor || item.doctor_name || 'Não informado',
-        city: item.city || item.patient_city || 'Não informada',
-        procedure: item.procedure || 'Não informado',
-        insurance: item.insurance || 'Não informado',
-        appointment_status: item.appointment_status || 'Não Confirmada',
-        appointment_date: item.appointment_date || item.start_time || new Date().toISOString(),
-        created_at: item.created_at || item.start_time || new Date().toISOString(),
-        updated_at: item.updated_at || item.start_time || new Date().toISOString(),
-        phone: item.phone || '',
+        id: actualItem.appointment_id || actualItem.opportunity_id || '',
+        opportunity_id: actualItem.opportunity_id || actualItem.appointment_id || '-',
+        patient_name: actualItem.patient_name || 'Não informado',
+        doctor: actualItem.doctor || actualItem.doctor_name || 'Não informado',
+        city: actualItem.city || actualItem.patient_city || 'Não informada',
+        procedure: actualItem.procedure || 'Não informado',
+        insurance: actualItem.insurance || 'Não informado',
+        appointment_status: actualItem.appointment_status || 'Não Confirmada',
+        appointment_date: actualItem.appointment_date || actualItem.start_time || new Date().toISOString(),
+        created_at: actualItem.created_at || actualItem.start_time || new Date().toISOString(),
+        updated_at: actualItem.updated_at || actualItem.start_time || new Date().toISOString(),
+        phone: actualItem.phone || '',
         notes: ''
       };
     }) : [];
