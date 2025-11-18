@@ -27,17 +27,17 @@ export const fetchAppointments = async (): Promise<Appointment[]> => {
     const mappedData = Array.isArray(data) ? data.map(item => {
       return {
         id: item.appointment_id || '',
-        opportunity_id: item.appointment_id || '-',
+        opportunity_id: item.opportunity_id || item.appointment_id || '-',
         patient_name: item.patient_name || 'Não informado',
-        doctor: item.doctor_name || 'Não informado',
-        city: item.patient_city || 'Não informada',
+        doctor: item.doctor || item.doctor_name || 'Não informado',
+        city: item.city || item.patient_city || 'Não informada',
         procedure: item.procedure || 'Não informado',
         insurance: item.insurance || 'Não informado',
         appointment_status: item.appointment_status || 'Não Confirmada',
-        appointment_date: item.start_time || new Date().toISOString(),
-        created_at: item.start_time || new Date().toISOString(),
-        updated_at: item.start_time || new Date().toISOString(),
-        phone: '',
+        appointment_date: item.appointment_date || item.start_time || new Date().toISOString(),
+        created_at: item.created_at || item.start_time || new Date().toISOString(),
+        updated_at: item.updated_at || item.start_time || new Date().toISOString(),
+        phone: item.phone || '',
         notes: ''
       };
     }) : [];
@@ -108,17 +108,17 @@ export const fetchAppointmentsWithFilters = async (filters: {
     const mappedData = Array.isArray(data) ? data.map(item => {
       return {
         id: item.appointment_id || '',
-        opportunity_id: item.appointment_id || '-',
+        opportunity_id: item.opportunity_id || item.appointment_id || '-',
         patient_name: item.patient_name || 'Não informado',
-        doctor: item.doctor_name || 'Não informado',
-        city: item.patient_city || 'Não informada',
+        doctor: item.doctor || item.doctor_name || 'Não informado',
+        city: item.city || item.patient_city || 'Não informada',
         procedure: item.procedure || 'Não informado',
         insurance: item.insurance || 'Não informado',
         appointment_status: item.appointment_status || 'Não Confirmada',
-        appointment_date: item.start_time || new Date().toISOString(),
-        created_at: item.start_time || new Date().toISOString(),
-        updated_at: item.start_time || new Date().toISOString(),
-        phone: '',
+        appointment_date: item.appointment_date || item.start_time || new Date().toISOString(),
+        created_at: item.created_at || item.start_time || new Date().toISOString(),
+        updated_at: item.updated_at || item.start_time || new Date().toISOString(),
+        phone: item.phone || '',
         notes: ''
       };
     }) : [];
