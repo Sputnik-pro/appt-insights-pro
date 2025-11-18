@@ -27,7 +27,6 @@ interface FilterBarProps {
   filters: Filters;
   onFilterChange: (filters: Filters) => void;
   onRefresh: () => void;
-  onExport?: () => void;
   options: FilterOptions;
 }
 
@@ -35,7 +34,6 @@ export function FilterBar({
   filters, 
   onFilterChange, 
   onRefresh, 
-  onExport,
   options 
 }: FilterBarProps) {
   const updateFilter = (key: keyof Filters, value: string) => {
@@ -223,17 +221,6 @@ export function FilterBar({
             <Filter className="h-4 w-4" />
             Limpar Filtros
           </Button>
-
-          {onExport && (
-            <Button 
-              variant="default" 
-              onClick={onExport}
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>

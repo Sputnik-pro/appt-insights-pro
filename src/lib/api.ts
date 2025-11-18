@@ -61,7 +61,7 @@ const generateFallbackData = (): Appointment[] => {
       city: 'Cidade Exemplo',
       procedure: 'Consulta Geral',
       insurance: 'Particular',
-      appointment_status: 'Confirmado',
+      appointment_status: 'Confirmada',
       appointment_date: new Date().toISOString(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
