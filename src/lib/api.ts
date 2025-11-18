@@ -3,7 +3,7 @@
 import { Appointment } from '@/types/appointment';
 
 // URL da sua API do n8n
-const API_BASE_URL = 'https://sputnik-n8n.cloudfy.cloud/webhook';
+const API_BASE_URL = 'https://sputnikpro-n8n.cloudfy.live/webhook';
 
 // Função para buscar agendamentos da API real
 export const fetchAppointments = async (): Promise<Appointment[]> => {
