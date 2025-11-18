@@ -1,5 +1,4 @@
 // src/lib/api.ts
-
 import { Appointment } from '@/types/appointment';
 
 // URL da sua API do n8n
@@ -24,28 +23,26 @@ export const fetchAppointments = async (): Promise<Appointment[]> => {
     const data = await response.json();
     console.log('Dados recebidos da API:', data);
 
-    // Se os dados vêm em um array direto
-    if (Array.isArray(data)) {
-      return data;
-    }
+    // Mapear dados da API para o formato esperado
+    const mappedData = Array.isArray(data) ? data.map(item => ({
+      id: item.opportunity_id || item.id,
+      opportunity_id: item.opportunity_id,
+      patient_name: item.patient_name || '',
+      doctor: item.doctor || 'Não informado',
+      city: item.city || 'Não informada',
+      procedure: item.procedure || '',
+      insurance: item.insurance || '',
+      appointment_status: item.appointment_status,
+      appointment_date: item.appointment_date,
+      created_at: item.created_at,
+      updated_at: item.updated_at || item.created_at,
+      notes: ''
+    })) : [];
 
-    // Se os dados vêm dentro de uma propriedade (ajuste conforme necessário)
-    if (data.appointments) {
-      return data.appointments;
-    }
-
-    // Se é um objeto único, transforma em array
-    if (data && typeof data === 'object') {
-      return [data];
-    }
-
-    console.warn('Formato de dados inesperado:', data);
-    return [];
+    return mappedData;
 
   } catch (error) {
     console.error('Erro ao buscar agendamentos:', error);
-    
-    // Fallback: retorna dados de exemplo em caso de erro
     return generateFallbackData();
   }
 };
@@ -79,7 +76,6 @@ export const fetchAppointmentsWithFilters = async (filters: {
   convenio?: string;
 }): Promise<Appointment[]> => {
   try {
-    // Construir query string com filtros
     const queryParams = new URLSearchParams();
     
     if (filters.cidade) queryParams.append('cidade', filters.cidade);
@@ -105,15 +101,23 @@ export const fetchAppointmentsWithFilters = async (filters: {
 
     const data = await response.json();
     
-    if (Array.isArray(data)) {
-      return data;
-    }
-    
-    if (data.appointments) {
-      return data.appointments;
-    }
+    // Mapear dados filtrados
+    const mappedData = Array.isArray(data) ? data.map(item => ({
+      id: item.opportunity_id || item.id,
+      opportunity_id: item.opportunity_id,
+      patient_name: item.patient_name || '',
+      doctor: item.doctor || 'Não informado',
+      city: item.city || 'Não informada',
+      procedure: item.procedure || '',
+      insurance: item.insurance || '',
+      appointment_status: item.appointment_status,
+      appointment_date: item.appointment_date,
+      created_at: item.created_at,
+      updated_at: item.updated_at || item.created_at,
+      notes: ''
+    })) : [];
 
-    return [data].filter(Boolean);
+    return mappedData;
 
   } catch (error) {
     console.error('Erro ao buscar agendamentos com filtros:', error);
