@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Appointment } from "@/types/appointment";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import * as XLSX from 'xlsx';
 
 interface AppointmentsTableProps {
@@ -49,14 +50,25 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
     setCurrentPage(1); // Reset para primeira página ao ordenar
   };
 
+  const formatDate = (dateString: string) => {
+    try {
+      const date = parseISO(dateString);
+      return format(date, "dd/MM/yyyy HH:mm", { locale: ptBR });
+    } catch {
+      return "-";
+    }
+  };
+
   const exportToXLSX = () => {
     const data = appointments.map(appointment => ({
+      "ID Oportunidade": appointment.opportunity_id,
       "Paciente": appointment.patient_name,
       "Cidade": appointment.city,
       "Procedimento": appointment.procedure,
       "Médico": appointment.doctor,
       "Convênio": appointment.insurance,
-      "Status": appointment.appointment_status
+      "Status": appointment.appointment_status,
+      "Data Agendamento": formatDate(appointment.appointment_date)
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -117,6 +129,9 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
                 <th className="text-left p-4 font-medium text-gray-900">
                   <SortButton column="appointment_status">Status</SortButton>
                 </th>
+                <th className="text-left p-4 font-medium text-gray-900">
+                  <SortButton column="appointment_date">Data</SortButton>
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -124,24 +139,28 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
                 <tr key={appointment.id || index} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="p-4">
                     <div>
-                      <div className="font-medium text-gray-900">{appointment.patient_name}</div>
-                      <div className="text-sm text-gray-500">{appointment.opportunity_id}</div>
+                      <div className="font-medium text-gray-900">{appointment.patient_name || 'Não informado'}</div>
+                      <div className="text-sm text-gray-500">{appointment.opportunity_id || '-'}</div>
                     </div>
                   </td>
-                  <td className="p-4 text-gray-900">{appointment.city}</td>
-                  <td className="p-4 text-gray-900">{appointment.procedure}</td>
-                  <td className="p-4 text-gray-900">{appointment.doctor}</td>
-                  <td className="p-4 text-gray-900">{appointment.insurance}</td>
+                  <td className="p-4 text-gray-900">{appointment.city || 'Não informada'}</td>
+                  <td className="p-4 text-gray-900">{appointment.procedure || 'Não informado'}</td>
+                  <td className="p-4 text-gray-900">{appointment.doctor || 'Não informado'}</td>
+                  <td className="p-4 text-gray-900">{appointment.insurance || 'Não informado'}</td>
                   <td className="p-4">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       appointment.appointment_status === 'Confirmada' ? 'bg-green-100 text-green-800' :
                       appointment.appointment_status === 'Não Confirmada' ? 'bg-yellow-100 text-yellow-800' :
                       appointment.appointment_status === 'Cancelada' ? 'bg-red-100 text-red-800' :
+                      appointment.appointment_status === 'Concluída - Compareceu' ? 'bg-blue-100 text-blue-800' :
+                      appointment.appointment_status === 'Não Compareceu' ? 'bg-orange-100 text-orange-800' :
+                      appointment.appointment_status === 'Pós Cirurgia' ? 'bg-purple-100 text-purple-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
-                      {appointment.appointment_status}
+                      {appointment.appointment_status || 'Não Confirmada'}
                     </span>
                   </td>
+                  <td className="p-4 text-gray-900 text-sm">{formatDate(appointment.appointment_date)}</td>
                 </tr>
               ))}
             </tbody>

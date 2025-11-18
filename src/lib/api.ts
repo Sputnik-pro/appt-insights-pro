@@ -24,20 +24,26 @@ export const fetchAppointments = async (): Promise<Appointment[]> => {
     console.log('Dados recebidos da API:', data);
 
     // Mapear dados da API para o formato esperado
-    const mappedData = Array.isArray(data) ? data.map(item => ({
-      id: item.opportunity_id || item.id,
-      opportunity_id: item.opportunity_id,
-      patient_name: item.patient_name || '',
-      doctor: item.doctor || 'Não informado',
-      city: item.city || 'Não informada',
-      procedure: item.procedure || '',
-      insurance: item.insurance || '',
-      appointment_status: item.appointment_status,
-      appointment_date: item.appointment_date,
-      created_at: item.created_at,
-      updated_at: item.updated_at || item.created_at,
-      notes: ''
-    })) : [];
+    // A API retorna um array de objetos com os dados dentro da propriedade "json"
+    const mappedData = Array.isArray(data) ? data.map(item => {
+      const jsonData = item.json || item; // Extrai os dados do campo "json"
+      
+      return {
+        id: jsonData.opportunity_id || jsonData.id || '',
+        opportunity_id: jsonData.opportunity_id || '-',
+        patient_name: jsonData.patient_name || 'Não informado',
+        doctor: jsonData.doctor || 'Não informado',
+        city: jsonData.city || 'Não informada',
+        procedure: jsonData.procedure || 'Não informado',
+        insurance: jsonData.insurance || 'Não informado',
+        appointment_status: jsonData.appointment_status || 'Não Confirmada',
+        appointment_date: jsonData.appointment_date || new Date().toISOString(),
+        created_at: jsonData.created_at || jsonData.appointment_date || new Date().toISOString(),
+        updated_at: jsonData.updated_at || jsonData.created_at || jsonData.appointment_date || new Date().toISOString(),
+        phone: jsonData.phone || '',
+        notes: ''
+      };
+    }) : [];
 
     return mappedData;
 
@@ -102,20 +108,25 @@ export const fetchAppointmentsWithFilters = async (filters: {
     const data = await response.json();
     
     // Mapear dados filtrados
-    const mappedData = Array.isArray(data) ? data.map(item => ({
-      id: item.opportunity_id || item.id,
-      opportunity_id: item.opportunity_id,
-      patient_name: item.patient_name || '',
-      doctor: item.doctor || 'Não informado',
-      city: item.city || 'Não informada',
-      procedure: item.procedure || '',
-      insurance: item.insurance || '',
-      appointment_status: item.appointment_status,
-      appointment_date: item.appointment_date,
-      created_at: item.created_at,
-      updated_at: item.updated_at || item.created_at,
-      notes: ''
-    })) : [];
+    const mappedData = Array.isArray(data) ? data.map(item => {
+      const jsonData = item.json || item; // Extrai os dados do campo "json"
+      
+      return {
+        id: jsonData.opportunity_id || jsonData.id || '',
+        opportunity_id: jsonData.opportunity_id || '-',
+        patient_name: jsonData.patient_name || 'Não informado',
+        doctor: jsonData.doctor || 'Não informado',
+        city: jsonData.city || 'Não informada',
+        procedure: jsonData.procedure || 'Não informado',
+        insurance: jsonData.insurance || 'Não informado',
+        appointment_status: jsonData.appointment_status || 'Não Confirmada',
+        appointment_date: jsonData.appointment_date || new Date().toISOString(),
+        created_at: jsonData.created_at || jsonData.appointment_date || new Date().toISOString(),
+        updated_at: jsonData.updated_at || jsonData.created_at || jsonData.appointment_date || new Date().toISOString(),
+        phone: jsonData.phone || '',
+        notes: ''
+      };
+    }) : [];
 
     return mappedData;
 
