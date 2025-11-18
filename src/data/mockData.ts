@@ -81,7 +81,7 @@ export const statuses: AppointmentStatus[] = [
 // Adicione esta função no lugar da generateMockAppointments
 export const fetchRealAppointments = async (): Promise<Appointment[]> => {
   try {
-    const response = await fetch('https://sputnik-n8n.cloudfy.cloud/webhook/dashboard-data');
+    const response = await fetch('https://sputnikpro-n8n.cloudfy.live/webhook/dashboard-data');
     const data = await response.json();
     
     console.log('Dados da API:', data);
