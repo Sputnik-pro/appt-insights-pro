@@ -48,6 +48,24 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
     });
   }, [totalPages]);
 
+  // Paginação inteligente: mostra apenas páginas próximas da atual
+  const getVisiblePages = (): (number | string)[] => {
+    const delta = 2;
+    const range: (number | string)[] = [];
+    for (let i = Math.max(1, currentPage - delta); i <= Math.min(totalPages, currentPage + delta); i++) {
+      range.push(i);
+    }
+    if ((range[0] as number) > 1) {
+      if ((range[0] as number) > 2) range.unshift('...');
+      range.unshift(1);
+    }
+    if ((range[range.length - 1] as number) < totalPages) {
+      if ((range[range.length - 1] as number) < totalPages - 1) range.push('...');
+      range.push(totalPages);
+    }
+    return range;
+  };
+
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -195,17 +213,21 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
               </Button>
 
               <div className="flex items-center gap-1 whitespace-nowrap px-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className="min-w-[28px] h-7 px-2 flex-shrink-0"
-                  >
-                    {page}
-                  </Button>
-                ))}
+                {getVisiblePages().map((page, idx) =>
+                  page === '...' ? (
+                    <span key={`ellipsis-${idx}`} className="px-2 text-gray-500 select-none">…</span>
+                  ) : (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page as number)}
+                      className="min-w-[28px] h-7 px-2 flex-shrink-0"
+                    >
+                      {page}
+                    </Button>
+                  )
+                )}
               </div>
 
               <Button
