@@ -27,11 +27,11 @@ const getDefaultFilters = (): Filters => {
   return {
     startDate: oneYearAgo.toISOString().split('T')[0],
     endDate: today.toISOString().split('T')[0],
-    doctor: '',
-    city: '',
-    status: '',
-    procedure: '',
-    insurance: ''
+    doctor: 'all',
+    city: 'all',
+    status: 'all',
+    procedure: 'all',
+    insurance: 'all'
   };
 };
 
@@ -81,40 +81,43 @@ export function useFilters(appointments: Appointment[]) {
 
   // Filtrar agendamentos baseado nos filtros ativos
   const filteredAppointments = useMemo(() => {
-    return appointments.filter(appointment => {
-      // Filtro de data
+    return appointments.filter((appointment) => {
+      // Filtro de data (inclui o dia inteiro do endDate)
       if (appointment.appointment_date) {
         const appointmentDate = new Date(appointment.appointment_date);
         const startDate = new Date(filters.startDate);
+        startDate.setHours(0, 0, 0, 0);
+
         const endDate = new Date(filters.endDate);
-        
+        endDate.setHours(23, 59, 59, 999);
+
         if (appointmentDate < startDate || appointmentDate > endDate) {
           return false;
         }
       }
 
       // Filtro de médico
-      if (filters.doctor && appointment.doctor !== filters.doctor) {
+      if (filters.doctor !== 'all' && appointment.doctor !== filters.doctor) {
         return false;
       }
 
       // Filtro de cidade
-      if (filters.city && appointment.city !== filters.city) {
+      if (filters.city !== 'all' && appointment.city !== filters.city) {
         return false;
       }
 
       // Filtro de status
-      if (filters.status && appointment.appointment_status !== filters.status) {
+      if (filters.status !== 'all' && appointment.appointment_status !== filters.status) {
         return false;
       }
 
       // Filtro de procedimento
-      if (filters.procedure && appointment.procedure !== filters.procedure) {
+      if (filters.procedure !== 'all' && appointment.procedure !== filters.procedure) {
         return false;
       }
 
       // Filtro de convênio
-      if (filters.insurance && appointment.insurance !== filters.insurance) {
+      if (filters.insurance !== 'all' && appointment.insurance !== filters.insurance) {
         return false;
       }
 

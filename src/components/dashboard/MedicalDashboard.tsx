@@ -32,9 +32,12 @@ export function MedicalDashboard() {
     );
   }
 
-  const hasActiveFilters = Object.values(filters).some(filter => 
-    filter !== 'all' && filter !== filters.startDate && filter !== filters.endDate
-  );
+  const hasActiveFilters =
+    filters.doctor !== 'all' ||
+    filters.city !== 'all' ||
+    filters.status !== 'all' ||
+    filters.procedure !== 'all' ||
+    filters.insurance !== 'all';
 
   return (
     <div className="min-h-screen bg-gray-50">
