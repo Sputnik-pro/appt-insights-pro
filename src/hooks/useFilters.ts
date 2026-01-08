@@ -82,16 +82,13 @@ export function useFilters(appointments: Appointment[]) {
   // Filtrar agendamentos baseado nos filtros ativos
   const filteredAppointments = useMemo(() => {
     return appointments.filter((appointment) => {
-      // Filtro de data (inclui o dia inteiro do endDate)
+      // Filtro de data (comparação apenas por dia, ignora horário)
       if (appointment.appointment_date) {
-        const appointmentDate = new Date(appointment.appointment_date);
-        const startDate = new Date(filters.startDate);
-        startDate.setHours(0, 0, 0, 0);
+        const appDateStr = new Date(appointment.appointment_date).toISOString().split('T')[0];
+        const startDate = filters.startDate; // Já vem como string YYYY-MM-DD
+        const endDate = filters.endDate;
 
-        const endDate = new Date(filters.endDate);
-        endDate.setHours(23, 59, 59, 999);
-
-        if (appointmentDate < startDate || appointmentDate > endDate) {
+        if (appDateStr < startDate || appDateStr > endDate) {
           return false;
         }
       }
