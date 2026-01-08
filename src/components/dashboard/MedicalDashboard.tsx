@@ -6,7 +6,14 @@ import { fetchAppointments } from "@/lib/api";
 
 export function MedicalDashboard() {
   // Buscar dados dos agendamentos
-  const { data: appointments = [], isLoading, refetch } = useQuery({
+  const {
+    data: appointments = [],
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['appointments'],
     queryFn: fetchAppointments,
     refetchInterval: 30000,
@@ -21,12 +28,29 @@ export function MedicalDashboard() {
     clearFilters
   } = useFilters(appointments);
 
-  if (isLoading) {
+  if (isLoading && appointments.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
           <p className="text-gray-600 text-lg">Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-lg w-full text-center space-y-3">
+          <h1 className="text-xl font-semibold text-gray-900">Não foi possível carregar os dados</h1>
+          <p className="text-sm text-gray-600 break-words">{error instanceof Error ? error.message : 'Erro desconhecido'}</p>
+          <button
+            onClick={() => refetch()}
+            className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-gray-900 text-white text-sm"
+          >
+            Tentar novamente
+          </button>
         </div>
       </div>
     );
@@ -54,6 +78,7 @@ export function MedicalDashboard() {
             <div className="mt-4 text-sm text-gray-500">
               {filteredAppointments.length} de {appointments.length} agendamentos
               {hasActiveFilters ? ' (filtrados)' : ''}
+              {isFetching ? ' • atualizando…' : ''}
             </div>
           </div>
         </div>
