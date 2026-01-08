@@ -29,14 +29,16 @@ export const fetchAppointments = async (): Promise<Appointment[]> => {
           // n8n pode retornar [{ json: {...}, pairedItem: {...}}]
           const actualItem = item?.json ?? item;
 
-          const id = actualItem.appointment_id || actualItem.opportunity_id || '';
-          const appointmentDate = actualItem.start_time || actualItem.appointment_date || new Date().toISOString();
-          const doctor = actualItem.doctor_name || actualItem.doctor || 'Não informado';
-          const city = actualItem.patient_city || actualItem.city || 'Não informada';
+          const id = actualItem.appointment_id || '';
+          const appointmentDate = actualItem.start_time || new Date().toISOString();
+          const doctor = actualItem.doctor_name || 'Não informado';
+          const cityPart = actualItem.patient_city || '';
+          const statePart = actualItem.patient_state || '';
+          const city = cityPart && statePart ? `${cityPart.trim()} - ${statePart}` : (cityPart || statePart || 'Não informada');
 
           return {
             id,
-            opportunity_id: actualItem.opportunity_id || actualItem.appointment_id || '-',
+            opportunity_id: actualItem.contact_id || actualItem.appointment_id || '-',
             patient_name: actualItem.patient_name || 'Não informado',
             doctor,
             city,
@@ -45,8 +47,8 @@ export const fetchAppointments = async (): Promise<Appointment[]> => {
             appointment_status: actualItem.appointment_status || 'Não Confirmada',
             appointment_date: appointmentDate,
             created_at: actualItem.created_at || appointmentDate,
-            updated_at: actualItem.updated_at || appointmentDate,
-            phone: actualItem.phone || '',
+            updated_at: actualItem.created_at || appointmentDate,
+            phone: actualItem.patient_phone || '',
             notes: '',
           };
         })
@@ -119,14 +121,16 @@ export const fetchAppointmentsWithFilters = async (filters: {
       ? data.map((item) => {
           const actualItem = item?.json ?? item;
 
-          const id = actualItem.appointment_id || actualItem.opportunity_id || '';
-          const appointmentDate = actualItem.start_time || actualItem.appointment_date || new Date().toISOString();
-          const doctor = actualItem.doctor_name || actualItem.doctor || 'Não informado';
-          const city = actualItem.patient_city || actualItem.city || 'Não informada';
+          const id = actualItem.appointment_id || '';
+          const appointmentDate = actualItem.start_time || new Date().toISOString();
+          const doctor = actualItem.doctor_name || 'Não informado';
+          const cityPart = actualItem.patient_city || '';
+          const statePart = actualItem.patient_state || '';
+          const city = cityPart && statePart ? `${cityPart.trim()} - ${statePart}` : (cityPart || statePart || 'Não informada');
 
           return {
             id,
-            opportunity_id: actualItem.opportunity_id || actualItem.appointment_id || '-',
+            opportunity_id: actualItem.contact_id || actualItem.appointment_id || '-',
             patient_name: actualItem.patient_name || 'Não informado',
             doctor,
             city,
@@ -135,8 +139,8 @@ export const fetchAppointmentsWithFilters = async (filters: {
             appointment_status: actualItem.appointment_status || 'Não Confirmada',
             appointment_date: appointmentDate,
             created_at: actualItem.created_at || appointmentDate,
-            updated_at: actualItem.updated_at || appointmentDate,
-            phone: actualItem.phone || '',
+            updated_at: actualItem.created_at || appointmentDate,
+            phone: actualItem.patient_phone || '',
             notes: '',
           };
         })
