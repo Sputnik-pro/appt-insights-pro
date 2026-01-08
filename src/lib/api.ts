@@ -23,32 +23,41 @@ export const fetchAppointments = async (): Promise<Appointment[]> => {
     const data = await response.json();
     console.log('Dados recebidos da API (itens):', Array.isArray(data) ? data.length : 0);
 
-    // Mapear dados da API para o formato esperado
+    // Mapear dados da API para o formato esperado (suporta formatos antigo e novo)
     const mappedData = Array.isArray(data)
       ? data.map((item) => {
           // n8n pode retornar [{ json: {...}, pairedItem: {...}}]
           const actualItem = item?.json ?? item;
 
-          const id = actualItem.appointment_id || '';
-          const appointmentDate = actualItem.start_time || new Date().toISOString();
-          const doctor = actualItem.doctor_name || 'Não informado';
-          const cityPart = actualItem.patient_city || '';
-          const statePart = actualItem.patient_state || '';
-          const city = cityPart && statePart ? `${cityPart.trim()} - ${statePart}` : (cityPart || statePart || 'Não informada');
+          const toText = (v: unknown, fallback: string) => {
+            if (v === null || v === undefined) return fallback;
+            const s = String(v).trim();
+            return s.length ? s : fallback;
+          };
+
+          const id = toText(actualItem.appointment_id ?? actualItem.opportunity_id, '');
+          const opportunityId = toText(actualItem.opportunity_id ?? actualItem.contact_id ?? actualItem.appointment_id, '-');
+
+          const appointmentDate = toText(actualItem.start_time ?? actualItem.appointment_date, new Date().toISOString());
+          const doctor = toText(actualItem.doctor_name ?? actualItem.doctor, 'Não informado');
+
+          const cityPart = toText(actualItem.patient_city ?? actualItem.city, '');
+          const statePart = toText(actualItem.patient_state, '');
+          const city = cityPart && statePart ? `${cityPart} - ${statePart}` : (cityPart || 'Não informada');
 
           return {
             id,
-            opportunity_id: actualItem.contact_id || actualItem.appointment_id || '-',
-            patient_name: actualItem.patient_name || 'Não informado',
+            opportunity_id: opportunityId,
+            patient_name: toText(actualItem.patient_name, 'Não informado'),
             doctor,
             city,
-            procedure: actualItem.procedure || 'Não informado',
-            insurance: actualItem.insurance || 'Não informado',
-            appointment_status: actualItem.appointment_status || 'Não Confirmada',
+            procedure: toText(actualItem.procedure, 'Não informado'),
+            insurance: toText(actualItem.insurance, 'Não informado'),
+            appointment_status: toText(actualItem.appointment_status, 'Não Confirmada') as Appointment['appointment_status'],
             appointment_date: appointmentDate,
-            created_at: actualItem.created_at || appointmentDate,
-            updated_at: actualItem.created_at || appointmentDate,
-            phone: actualItem.patient_phone || '',
+            created_at: toText(actualItem.created_at, appointmentDate),
+            updated_at: toText(actualItem.updated_at ?? actualItem.created_at, appointmentDate),
+            phone: toText(actualItem.patient_phone ?? actualItem.phone, ''),
             notes: '',
           };
         })
@@ -116,31 +125,40 @@ export const fetchAppointmentsWithFilters = async (filters: {
 
     const data = await response.json();
     
-    // Mapear dados filtrados
+    // Mapear dados filtrados (suporta formatos antigo e novo)
     const mappedData = Array.isArray(data)
       ? data.map((item) => {
           const actualItem = item?.json ?? item;
 
-          const id = actualItem.appointment_id || '';
-          const appointmentDate = actualItem.start_time || new Date().toISOString();
-          const doctor = actualItem.doctor_name || 'Não informado';
-          const cityPart = actualItem.patient_city || '';
-          const statePart = actualItem.patient_state || '';
-          const city = cityPart && statePart ? `${cityPart.trim()} - ${statePart}` : (cityPart || statePart || 'Não informada');
+          const toText = (v: unknown, fallback: string) => {
+            if (v === null || v === undefined) return fallback;
+            const s = String(v).trim();
+            return s.length ? s : fallback;
+          };
+
+          const id = toText(actualItem.appointment_id ?? actualItem.opportunity_id, '');
+          const opportunityId = toText(actualItem.opportunity_id ?? actualItem.contact_id ?? actualItem.appointment_id, '-');
+
+          const appointmentDate = toText(actualItem.start_time ?? actualItem.appointment_date, new Date().toISOString());
+          const doctor = toText(actualItem.doctor_name ?? actualItem.doctor, 'Não informado');
+
+          const cityPart = toText(actualItem.patient_city ?? actualItem.city, '');
+          const statePart = toText(actualItem.patient_state, '');
+          const city = cityPart && statePart ? `${cityPart} - ${statePart}` : (cityPart || 'Não informada');
 
           return {
             id,
-            opportunity_id: actualItem.contact_id || actualItem.appointment_id || '-',
-            patient_name: actualItem.patient_name || 'Não informado',
+            opportunity_id: opportunityId,
+            patient_name: toText(actualItem.patient_name, 'Não informado'),
             doctor,
             city,
-            procedure: actualItem.procedure || 'Não informado',
-            insurance: actualItem.insurance || 'Não informado',
-            appointment_status: actualItem.appointment_status || 'Não Confirmada',
+            procedure: toText(actualItem.procedure, 'Não informado'),
+            insurance: toText(actualItem.insurance, 'Não informado'),
+            appointment_status: toText(actualItem.appointment_status, 'Não Confirmada') as Appointment['appointment_status'],
             appointment_date: appointmentDate,
-            created_at: actualItem.created_at || appointmentDate,
-            updated_at: actualItem.created_at || appointmentDate,
-            phone: actualItem.patient_phone || '',
+            created_at: toText(actualItem.created_at, appointmentDate),
+            updated_at: toText(actualItem.updated_at ?? actualItem.created_at, appointmentDate),
+            phone: toText(actualItem.patient_phone ?? actualItem.phone, ''),
             notes: '',
           };
         })
