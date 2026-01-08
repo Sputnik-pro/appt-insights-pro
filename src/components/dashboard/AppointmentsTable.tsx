@@ -40,6 +40,14 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
   const endIndex = startIndex + itemsPerPage;
   const currentAppointments = sortedAppointments.slice(startIndex, endIndex);
 
+  // Se filtros/refetch mudarem a quantidade de páginas, mantém a página atual válida
+  React.useEffect(() => {
+    setCurrentPage((prev) => {
+      const safeTotal = Math.max(1, totalPages);
+      return Math.min(Math.max(1, prev), safeTotal);
+    });
+  }, [totalPages]);
+
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -172,43 +180,45 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
           <div className="text-sm text-gray-600">
             Mostrando {startIndex + 1} a {Math.min(endIndex, sortedAppointments.length)} de {sortedAppointments.length} agendamentos
           </div>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="flex items-center gap-1"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Anterior</span>
-            </Button>
-            
-            <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] sm:max-w-none">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(page)}
-                  className="min-w-[32px] h-8 px-2 flex-shrink-0"
-                >
-                  {page}
-                </Button>
-              ))}
+
+          <div className="w-full sm:w-auto overflow-x-auto">
+            <div className="flex items-center gap-2 min-w-max">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="flex items-center gap-1"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Anterior</span>
+              </Button>
+
+              <div className="flex items-center gap-1 whitespace-nowrap px-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className="min-w-[28px] h-7 px-2 flex-shrink-0"
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-1"
+              >
+                <span className="hidden sm:inline">Próximo</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="flex items-center gap-1"
-            >
-              <span className="hidden sm:inline">Próximo</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </CardContent>
